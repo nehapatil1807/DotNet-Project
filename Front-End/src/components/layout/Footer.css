@@ -1,0 +1,94 @@
+.footer {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    margin-top: 100px;
+  }
+  
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #d4af37;
+  }
+  
+  .footer-title {
+    font-family: 'Playfair Display', serif;
+    color: #d4af37;
+    font-size: 1.2rem;
+  }
+  
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .footer-links li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer-links a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-links a:hover {
+    color: #d4af37;
+  }
+  
+  .footer-contact p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .footer-newsletter .form-control {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+  
+  .footer-newsletter .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .footer-newsletter .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: #d4af37;
+    box-shadow: none;
+  }
+  
+  .footer-social {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .social-link {
+    color: #ffffff;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  
+  .social-link:hover {
+    color: #d4af37;
+  }
+  
+  .footer-bottom {
+    background-color: #222222;
+    font-size: 0.9rem;
+  }
+  
+  .payment-methods {
+    max-height: 30px;
+    width: auto;
+  }
+  
+  @media (max-width: 767.98px) {
+    .footer-bottom .col-md-6 {
+      text-align: center !important;
+      margin-bottom: 1rem;
+    }
+    
+    .footer-bottom .col-md-6:last-child {
+      margin-bottom: 0;
+    }
+  }

@@ -1,0 +1,82 @@
+/* ProductCard.css */
+.product-card {
+    border: none;
+    transition: all 0.3s ease;
+    background: #fff;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  
+  .product-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  
+  .product-image {
+    transition: transform 0.5s ease;
+    height: 300px;
+    width: 100%;
+    object-fit: cover;
+  }
+  
+  .product-card:hover .product-image {
+    transform: scale(1.05);
+  }
+  
+  .product-category-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #333;
+  }
+  
+  .product-price {
+    font-size: 1.25rem;
+    color: #d4af37;
+    font-weight: 600;
+  }
+  
+  .product-stock {
+    font-size: 0.875rem;
+    color: #666;
+  }
+  
+  .btn-view-details {
+    background: transparent;
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-view-details:hover {
+    background: #d4af37;
+    color: white;
+  }
+  
+  .btn-add-cart {
+    background: #d4af37;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-add-cart:hover {
+    background: #c4a030;
+    transform: translateY(-2px);
+  }
+  
+  .product-buttons {
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .product-card:hover .product-buttons {
+    opacity: 1;
+  }

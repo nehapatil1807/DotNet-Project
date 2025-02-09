@@ -1,26 +1,69 @@
-// src/services/orderService.js
 import api from './api';
 
 export const orderService = {
-  // User methods
-  createOrder: async () => {
-    return await api.post('/order/checkout');
-  },
+    // Create a new order from cart
+    createOrder: async (orderData) => {
+        try {
+            console.log('Creating order with data:', orderData);
+            const response = await api.post('/order/checkout', {
+                shippingDetails: orderData.shippingDetails,
+                paymentMethod: orderData.paymentMethod
+            });
+            console.log('Order creation response:', response);
+            return response;
+        } catch (error) {
+            console.error('Order creation error:', error);
+            throw error;
+        }
+    },
 
-  getOrder: async (orderId) => {
-    return await api.get(`/order/${orderId}`);
-  },
+    // Get a specific order
+    getOrder: async (orderId) => {
+        try {
+            const response = await api.get(`/order/${orderId}`);
+            console.log('Get order response:', response);
+            return response;
+        } catch (error) {
+            console.error('Get order error:', error);
+            throw error;
+        }
+    },
 
-  getUserOrders: async () => {
-    return await api.get('/order');
-  },
+    // Get user's orders
+    getUserOrders: async () => {
+        try {
+            const response = await api.get('/order');
+            console.log('Get user orders response:', response);
+            return response;
+        } catch (error) {
+            console.error('Get user orders error:', error);
+            throw error;
+        }
+    },
 
-  // Admin methods
-  getAllOrders: async () => {
-    return await api.get('/order/all');
-  },
+    // Admin: Get all orders
+    getAllOrders: async () => {
+        try {
+            const response = await api.get('/order/all');
+            console.log('Get all orders response:', response);
+            return response;
+        } catch (error) {
+            console.error('Get all orders error:', error);
+            throw error;
+        }
+    },
 
-  updateOrderStatus: async (orderId, statusDto) => {
-    return await api.put(`/order/${orderId}/status`, statusDto);
-  }
+    // Admin: Update order status
+    updateOrderStatus: async (orderId, status) => {
+        try {
+            const response = await api.put(`/order/${orderId}/status`, {
+                status: status
+            });
+            console.log('Update order status response:', response);
+            return response;
+        } catch (error) {
+            console.error('Update order status error:', error);
+            throw error;
+        }
+    }
 };

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { orderService } from '../services/orderService';
+import { toast } from 'react-toastify';
 
 const OrderContext = createContext(null);
 
@@ -7,16 +8,32 @@ export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const createOrder = async () => {
+  const createOrder = async (orderData) => {
     try {
       setLoading(true);
-      const response = await orderService.createOrder();
+      console.log('Creating order with data:', orderData);
+      const response = await orderService.createOrder(orderData);
+      console.log('Order creation response:', response);
+
       if (response.success) {
-        return { success: true, order: response.data };
+        // Add the new order to the orders list
+        setOrders(prev => [response.data, ...prev]);
+        return { 
+          success: true, 
+          order: response.data,
+          message: 'Order created successfully'
+        };
       }
-      return { success: false, message: response.message };
+      return { 
+        success: false, 
+        message: response.message || 'Failed to create order'
+      };
     } catch (error) {
-      return { success: false, message: error.message };
+      console.error('Error creating order:', error);
+      return { 
+        success: false, 
+        message: error.message || 'Error creating order'
+      };
     } finally {
       setLoading(false);
     }
@@ -26,11 +43,16 @@ export const OrderProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await orderService.getUserOrders();
+      console.log('Fetched orders:', response);
+      
       if (response.success) {
         setOrders(response.data);
+      } else {
+        toast.error(response.message || 'Failed to fetch orders');
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
+      toast.error('Error fetching orders');
     } finally {
       setLoading(false);
     }
@@ -38,13 +60,23 @@ export const OrderProvider = ({ children }) => {
 
   const getOrder = async (orderId) => {
     try {
+      console.log('Fetching order:', orderId);
       const response = await orderService.getOrder(orderId);
+      console.log('Order details response:', response);
+      
       if (response.success) {
         return { success: true, order: response.data };
       }
-      return { success: false, message: response.message };
+      return { 
+        success: false, 
+        message: response.message || 'Order not found'
+      };
     } catch (error) {
-      return { success: false, message: error.message };
+      console.error('Error fetching order:', error);
+      return { 
+        success: false, 
+        message: error.message || 'Error fetching order details'
+      };
     }
   };
 
@@ -70,3 +102,5 @@ export const useOrders = () => {
   }
   return context;
 };
+
+export default OrderContext;

@@ -1,74 +1,90 @@
-﻿using ElegantJewellery.DTOs;
+﻿using AutoMapper;
+using ElegantJewellery.DTOs;
+using ElegantJewellery.Enties;
 using ElegantJewellery.Models;
 using ElegantJewellery.Repositories;
-using AutoMapper;
-using ElegantJewellery.Enties;
+using ElegantJewellery.Services;
 
-
-namespace ElegantJewellery.Services
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private readonly IGenericRepository<User> _userRepository;
+    private readonly IJwtService _jwtService;
+    private readonly IEmailService _emailService;
+    private readonly IMapper _mapper;
+
+    public UserService(
+        IGenericRepository<User> userRepository,
+        IJwtService jwtService,
+        IEmailService emailService,
+        IMapper mapper)
     {
-        private readonly IGenericRepository<User> _userRepository;
-        private readonly IJwtService _jwtService;
-        private readonly IMapper _mapper;
+        _userRepository = userRepository;
+        _jwtService = jwtService;
+        _emailService = emailService;
+        _mapper = mapper;
+    }
 
-        public UserService(
-            IGenericRepository<User> userRepository,
-            IJwtService jwtService,
-            IMapper mapper)
+    public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(UserDto userDto)
+    {
+        try
         {
-            _userRepository = userRepository;
-            _jwtService = jwtService;
-            _mapper = mapper;
-        }
-
-        public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(UserDto userDto)
-        {
-            try
-            {
-                // Validate email uniqueness
-                var emailExists = await CheckEmailExistsAsync(userDto.Email);
-                if (emailExists.Data)
-                {
-                    return ApiResponse<AuthResponseDto>.ErrorResponse(
-                        "Registration failed",
-                        new List<string> { "Email already exists" }
-                    );
-                }
-
-                // Validate role
-                if (!string.IsNullOrEmpty(userDto.Role) && !UserRoles.ValidRoles.Contains(userDto.Role))
-                {
-                    return ApiResponse<AuthResponseDto>.ErrorResponse(
-                        "Invalid role",
-                        new List<string> { $"Valid roles are: {string.Join(", ", UserRoles.ValidRoles)}" }
-                    );
-                }
-
-                var user = _mapper.Map<User>(userDto);
-                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-                user.Role = string.IsNullOrEmpty(userDto.Role) ? UserRoles.User : userDto.Role;
-
-                var createdUser = await _userRepository.AddAsync(user);
-                var token = _jwtService.GenerateToken(createdUser);
-                var userResponse = _mapper.Map<UserResponseDto>(createdUser);
-
-                return ApiResponse<AuthResponseDto>.SuccessResponse(
-                    new AuthResponseDto { Token = token, User = userResponse },
-                    "Registration successful"
-                );
-            }
-            catch (Exception ex)
+            // Validate email uniqueness
+            var emailExists = await CheckEmailExistsAsync(userDto.Email);
+            if (emailExists.Data)
             {
                 return ApiResponse<AuthResponseDto>.ErrorResponse(
                     "Registration failed",
-                    new List<string> { ex.Message }
+                    new List<string> { "Email already exists" }
                 );
             }
-        }
 
-        public async Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginDto loginDto)
+            // Validate role
+            if (!string.IsNullOrEmpty(userDto.Role) && !UserRoles.ValidRoles.Contains(userDto.Role))
+            {
+                return ApiResponse<AuthResponseDto>.ErrorResponse(
+                    "Invalid role",
+                    new List<string> { $"Valid roles are: {string.Join(", ", UserRoles.ValidRoles)}" }
+                );
+            }
+
+            var user = _mapper.Map<User>(userDto);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+            user.Role = string.IsNullOrEmpty(userDto.Role) ? UserRoles.User : userDto.Role;
+
+            var createdUser = await _userRepository.AddAsync(user);
+
+            // Send welcome email
+            try
+            {
+                await _emailService.SendWelcomeEmailAsync(
+                    createdUser.Email,
+                    $"{createdUser.FirstName} {createdUser.LastName}"
+                );
+            }
+            catch (Exception emailEx)
+            {
+                // Log the email error but don't fail the registration
+                Console.WriteLine($"Failed to send welcome email: {emailEx.Message}");
+            }
+
+            var token = _jwtService.GenerateToken(createdUser);
+            var userResponse = _mapper.Map<UserResponseDto>(createdUser);
+
+            return ApiResponse<AuthResponseDto>.SuccessResponse(
+                new AuthResponseDto { Token = token, User = userResponse },
+                "Registration successful"
+            );
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<AuthResponseDto>.ErrorResponse(
+                "Registration failed",
+                new List<string> { ex.Message }
+            );
+        }
+    }
+
+    public async Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginDto loginDto)
         {
             try
             {
@@ -139,4 +155,4 @@ namespace ElegantJewellery.Services
             }
         }
     }
-}
+

@@ -3,8 +3,16 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { OrderProvider } from './context/OrderContext';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// Admin Components
+import AdminLayout from './components/admin/layout/AdminLayout';
+import AdminDashboard from './components/admin/dashboard/AdminDashboard';
+import AdminProducts from './components/admin/products/AdminProducts';
+import AdminOrders from './components/admin/orders/AdminOrders';
+
+// Customer Components
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import HomePage from './components/home/Homepage';
@@ -13,16 +21,31 @@ import Register from './components/auth/Register';
 import ProductList from './components/products/ProductList';
 import ProductDetails from './components/products/ProductDetails';
 import Cart from './components/cart/Cart';
+import Checkout from './components/checkout/Checkout';
 import OrderList from './components/orders/OrderList';
 import OrderDetails from './components/orders/OrderDetails';
-import AdminDashboard from './components/admin/AdminDashboard';
-import ProductManagement from './components/admin/ProductManagement';
-import OrderManagement from './components/admin/OrderManagement';
+import OrderTracking from './components/orders/OrderTracking';
 import Loading from './components/common/Loading';
+
+// Styles
 import './styles/HomePage.css';
 import './styles/ProductCard.css';
+import './styles/admin.css';
+import './styles/theme.css';
 
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
 
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!user || user.role !== 'Admin') {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -38,20 +61,6 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
-const AdminRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (!user || user.role !== 'Admin') {
-    return <Navigate to="/products" replace />;
-  }
-
-  return children;
-};
-
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -60,103 +69,22 @@ const GuestRoute = ({ children }) => {
   }
 
   if (user) {
-    return <Navigate to="/products" replace />;
+    return <Navigate to={user.role === 'Admin' ? '/admin/dashboard' : '/'} replace />;
   }
 
   return children;
 };
 
-const AppRoutes = () => {
+const CustomerLayout = ({ children }) => {
   const { user } = useAuth();
-
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<HomePage />} />
-      <Route path="/products" element={<ProductList />} />
-      <Route path="/products/:id" element={<ProductDetails />} />
-      
-      {/* Guest Routes */}
-      <Route
-        path="/login"
-        element={
-          <GuestRoute>
-            <Login />
-          </GuestRoute>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <GuestRoute>
-            <Register />
-          </GuestRoute>
-        }
-      />
-
-      {/* Protected Routes */}
-      <Route
-        path="/cart"
-        element={
-          <PrivateRoute>
-            <Cart />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/orders"
-        element={
-          <PrivateRoute>
-            <OrderList />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/orders/:id"
-        element={
-          <PrivateRoute>
-            <OrderDetails />
-          </PrivateRoute>
-        }
-      />
-
-      {/* Admin Routes */}
-      <Route
-        path="/admin"
-        element={
-          <AdminRoute>
-            <Navigate to="/admin/dashboard" replace />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/dashboard"
-        element={
-          <AdminRoute>
-            <AdminDashboard />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/products"
-        element={
-          <AdminRoute>
-            <ProductManagement />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/orders"
-        element={
-          <AdminRoute>
-            <OrderManagement />
-          </AdminRoute>
-        }
-      />
-
-      {/* Catch all route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <div className="d-flex flex-column min-vh-100">
+      <Navbar />
+      <main className="flex-grow-1">
+        {children}
+      </main>
+      <Footer />
+    </div>
   );
 };
 
@@ -166,14 +94,140 @@ const App = () => {
       <AuthProvider>
         <CartProvider>
           <OrderProvider>
-            <div className="d-flex flex-column min-vh-100">
-              <Navbar />
-              <main className="flex-grow-1">
-                <AppRoutes />
-              </main>
-              <Footer />
-              <ToastContainer/>
-            </div>
+            <Routes>
+              {/* Admin Routes */}
+              <Route
+                path="/admin/*"
+                element={
+                  <AdminRoute>
+                    <AdminLayout>
+                      <Routes>
+                        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                        <Route path="dashboard" element={<AdminDashboard />} />
+                        <Route path="products" element={<AdminProducts />} />
+                        <Route path="orders" element={<AdminOrders />} />
+                      </Routes>
+                    </AdminLayout>
+                  </AdminRoute>
+                }
+              />
+
+              {/* Auth Routes */}
+              <Route
+                path="/login"
+                element={
+                  <GuestRoute>
+                    <CustomerLayout>
+                      <Login />
+                    </CustomerLayout>
+                  </GuestRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <GuestRoute>
+                    <CustomerLayout>
+                      <Register />
+                    </CustomerLayout>
+                  </GuestRoute>
+                }
+              />
+
+              {/* Customer Routes */}
+              <Route
+                path="/"
+                element={
+                  <CustomerLayout>
+                    <HomePage />
+                  </CustomerLayout>
+                }
+              />
+              <Route
+                path="/products"
+                element={
+                  <CustomerLayout>
+                    <ProductList />
+                  </CustomerLayout>
+                }
+              />
+              <Route
+                path="/products/:id"
+                element={
+                  <CustomerLayout>
+                    <ProductDetails />
+                  </CustomerLayout>
+                }
+              />
+
+              {/* Protected Customer Routes */}
+              <Route
+                path="/cart"
+                element={
+                  <PrivateRoute>
+                    <CustomerLayout>
+                      <Cart />
+                    </CustomerLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/checkout"
+                element={
+                  <PrivateRoute>
+                    <CustomerLayout>
+                      <Checkout />
+                    </CustomerLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/orders"
+                element={
+                  <PrivateRoute>
+                    <CustomerLayout>
+                      <OrderList />
+                    </CustomerLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/orders/:id"
+                element={
+                  <PrivateRoute>
+                    <CustomerLayout>
+                      <OrderDetails />
+                    </CustomerLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/order-tracking/:id"
+                element={
+                  <PrivateRoute>
+                    <CustomerLayout>
+                      <OrderTracking />
+                    </CustomerLayout>
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Catch all route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+
+            {/* Toast Container for notifications */}
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
           </OrderProvider>
         </CartProvider>
       </AuthProvider>

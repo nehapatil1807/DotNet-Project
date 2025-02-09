@@ -304,7 +304,13 @@
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "orderCreateDto",
+        "Type": "ElegantJewellery.DTOs.OrderCreateDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": [
       {
         "Type": "ElegantJewellery.DTOs.ApiResponse\u00601[[ElegantJewellery.DTOs.OrderResponseDto, ElegantJewellery, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",

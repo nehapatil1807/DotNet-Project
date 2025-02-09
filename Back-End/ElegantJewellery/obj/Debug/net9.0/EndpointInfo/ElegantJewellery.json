@@ -374,6 +374,25 @@
         "tags": [
           "Order"
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -1089,6 +1108,23 @@
         },
         "additionalProperties": false
       },
+      "OrderCreateDto": {
+        "required": [
+          "paymentMethod",
+          "shippingDetails"
+        ],
+        "type": "object",
+        "properties": {
+          "shippingDetails": {
+            "$ref": "#/components/schemas/ShippingDetailsDto"
+          },
+          "paymentMethod": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "OrderItemResponseDto": {
         "type": "object",
         "properties": {
@@ -1150,6 +1186,17 @@
             "nullable": true
           },
           "userName": {
+            "type": "string",
+            "nullable": true
+          },
+          "shippingDetails": {
+            "$ref": "#/components/schemas/ShippingDetailsDto"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "paymentStatus": {
             "type": "string",
             "nullable": true
           }
@@ -1326,6 +1373,50 @@
               "type": "string"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ShippingDetailsDto": {
+        "required": [
+          "addressLine1",
+          "city",
+          "fullName",
+          "phone",
+          "pincode",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "addressLine1": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "state": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "pincode": {
+            "minLength": 1,
+            "pattern": "^\\d{6}$",
+            "type": "string"
+          },
+          "phone": {
+            "minLength": 1,
+            "pattern": "^\\d{10}$",
+            "type": "string"
           }
         },
         "additionalProperties": false

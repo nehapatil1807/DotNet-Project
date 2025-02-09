@@ -6,7 +6,7 @@ const Carousel = () => {
       <div className="carousel-inner">
         <div className="carousel-item active">
           <img
-            src="https://cdn.bradojewellery.com/b/1920x/1735214924357.jpeg"
+            src="https://cdn.bradojewellery.com/b/1920x/1738398607419.jpeg"
             className="d-block w-100"
             alt="Slide 1"
           />
@@ -20,7 +20,7 @@ const Carousel = () => {
         </div>
         <div className="carousel-item">
           <img
-            src="https://cdn.bradojewellery.com/b/1920x/1735214900383.jpeg"
+            src="https://cdn.bradojewellery.com/b/1920x/1735214944494.jpeg"
             className="d-block w-100"
             alt="Slide 3"
           />

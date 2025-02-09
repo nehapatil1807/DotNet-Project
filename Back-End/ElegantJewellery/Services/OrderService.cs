@@ -10,21 +10,27 @@ namespace ElegantJewellery.Services
     {
         private readonly IGenericRepository<Order> _orderRepository;
         private readonly IGenericRepository<OrderItem> _orderItemRepository;
+        private readonly IGenericRepository<User> _userRepository;
         private readonly ICartService _cartService;
         private readonly IProductService _productService;
+        private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
 
         public OrderService(
             IGenericRepository<Order> orderRepository,
             IGenericRepository<OrderItem> orderItemRepository,
+            IGenericRepository<User> userRepository,
             ICartService cartService,
             IProductService productService,
+            IEmailService emailService,
             IMapper mapper)
         {
             _orderRepository = orderRepository;
             _orderItemRepository = orderItemRepository;
+            _userRepository = userRepository;
             _cartService = cartService;
             _productService = productService;
+            _emailService = emailService;
             _mapper = mapper;
         }
 
@@ -33,10 +39,10 @@ namespace ElegantJewellery.Services
             try
             {
                 var orders = await _orderRepository.GetAllWithIncludesAsync(
-                    o => true, // Get all orders
+                    o => true,
                     "OrderItems",
                     "OrderItems.Product",
-                    "User" // Include user information
+                    "User"
                 );
 
                 var orderResponses = await Task.WhenAll(
@@ -54,7 +60,7 @@ namespace ElegantJewellery.Services
             }
         }
 
-        public async Task<ApiResponse<OrderResponseDto>> CreateOrderFromCartAsync(int userId)
+        public async Task<ApiResponse<OrderResponseDto>> CreateOrderFromCartAsync(int userId, OrderCreateDto orderCreateDto)
         {
             try
             {
@@ -100,12 +106,22 @@ namespace ElegantJewellery.Services
                     await _productService.UpdateStockAsync(cartItem.ProductId, -cartItem.Quantity);
                 }
 
+                var shipping = orderCreateDto.ShippingDetails;
                 var order = new Order
                 {
                     UserId = userId,
                     OrderDate = DateTime.UtcNow,
                     Status = OrderStatus.Pending,
-                    TotalAmount = totalAmount
+                    TotalAmount = totalAmount,
+                    ShippingFullName = shipping.FullName,
+                    ShippingAddressLine1 = shipping.AddressLine1,
+                    ShippingAddressLine2 = shipping.AddressLine2,
+                    ShippingCity = shipping.City,
+                    ShippingState = shipping.State,
+                    ShippingPincode = shipping.Pincode,
+                    ShippingPhone = shipping.Phone,
+                    PaymentMethod = orderCreateDto.PaymentMethod,
+                    PaymentStatus = "Pending"
                 };
 
                 var createdOrder = await _orderRepository.AddAsync(order);
@@ -118,6 +134,18 @@ namespace ElegantJewellery.Services
 
                 // Clear the cart after successful order creation
                 await _cartService.ClearCartAsync(userId);
+
+                // Get user details and send confirmation email
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user != null)
+                {
+                    await _emailService.SendOrderConfirmationAsync(
+                        user.Email,
+                        $"{user.FirstName} {user.LastName}",
+                        createdOrder.Id,
+                        createdOrder.Status
+                    );
+                }
 
                 // Get complete order with items
                 var completeOrder = await GetOrderByIdWithItemsAsync(createdOrder.Id);
@@ -142,7 +170,7 @@ namespace ElegantJewellery.Services
             try
             {
                 var order = await GetOrderByIdWithItemsAsync(orderId);
-                if (order == null || order.UserId != userId)
+                if (order == null || (order.UserId != userId && !await IsAdminUser(userId)))
                 {
                     return ApiResponse<OrderResponseDto>.ErrorResponse("Order not found");
                 }
@@ -166,7 +194,8 @@ namespace ElegantJewellery.Services
                 var orders = await _orderRepository.GetAllWithIncludesAsync(
                     o => o.UserId == userId,
                     "OrderItems",
-                    "OrderItems.Product"
+                    "OrderItems.Product",
+                    "User"
                 );
 
                 var orderResponses = await Task.WhenAll(
@@ -204,8 +233,24 @@ namespace ElegantJewellery.Services
                     return ApiResponse<OrderResponseDto>.ErrorResponse("Order not found");
                 }
 
+                var oldStatus = order.Status;
                 order.Status = statusDto.Status;
                 await _orderRepository.UpdateAsync(order);
+
+                // Send email notification if status changed
+                if (oldStatus != statusDto.Status)
+                {
+                    var user = await _userRepository.GetByIdAsync(order.UserId);
+                    if (user != null)
+                    {
+                        await _emailService.SendOrderStatusUpdateAsync(
+                            user.Email,
+                            $"{user.FirstName} {user.LastName}",
+                            order.Id,
+                            statusDto.Status
+                        );
+                    }
+                }
 
                 var orderResponse = await CreateOrderResponseDto(order);
                 return ApiResponse<OrderResponseDto>.SuccessResponse(
@@ -227,7 +272,8 @@ namespace ElegantJewellery.Services
             var orders = await _orderRepository.GetAllWithIncludesAsync(
                 o => o.Id == orderId,
                 "OrderItems",
-                "OrderItems.Product"
+                "OrderItems.Product",
+                "User"
             );
             return orders.FirstOrDefault();
         }
@@ -238,11 +284,13 @@ namespace ElegantJewellery.Services
             {
                 Id = item.Id,
                 ProductId = item.ProductId,
-                ProductName = item.Product.Name,
+                ProductName = item.Product?.Name ?? "Unknown Product",
                 Quantity = item.Quantity,
                 UnitPrice = item.Price,
                 Subtotal = item.Price * item.Quantity
             }).ToList() ?? new List<OrderItemResponseDto>();
+
+            var userFullName = order.User != null ? $"{order.User.FirstName} {order.User.LastName}" : "Unknown";
 
             return new OrderResponseDto
             {
@@ -252,8 +300,26 @@ namespace ElegantJewellery.Services
                 Status = order.Status,
                 TotalAmount = order.TotalAmount,
                 Items = orderItems,
-                UserName = order.User?.FirstName ?? "Unknown"
+                UserName = userFullName,
+                ShippingDetails = new ShippingDetailsDto
+                {
+                    FullName = order.ShippingFullName,
+                    AddressLine1 = order.ShippingAddressLine1,
+                    AddressLine2 = order.ShippingAddressLine2,
+                    City = order.ShippingCity,
+                    State = order.ShippingState,
+                    Pincode = order.ShippingPincode,
+                    Phone = order.ShippingPhone
+                },
+                PaymentMethod = order.PaymentMethod,
+                PaymentStatus = order.PaymentStatus
             };
+        }
+
+        private async Task<bool> IsAdminUser(int userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            return user?.Role == "Admin";
         }
     }
 }

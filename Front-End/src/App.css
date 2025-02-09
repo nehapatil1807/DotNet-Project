@@ -1,0 +1,29 @@
+.password-strength {
+    margin-top: 0.5rem;
+  }
+  
+  .strength-bar {
+    height: 5px;
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  
+  .strength-bar.weak {
+    background-color: #dc3545;
+  }
+  
+  .strength-bar.medium {
+    background-color: #ffc107;
+  }
+  
+  .strength-bar.strong {
+    background-color: #28a745;
+  }
+  
+  .strength-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+  }

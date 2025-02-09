@@ -27,13 +27,11 @@ namespace ElegantJewellery.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-
-
         [HttpPost("checkout")]
-        public async Task<ActionResult<ApiResponse<OrderResponseDto>>> CreateOrder()
+        public async Task<ActionResult<ApiResponse<OrderResponseDto>>> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var response = await _orderService.CreateOrderFromCartAsync(userId);
+            var response = await _orderService.CreateOrderFromCartAsync(userId, orderCreateDto);
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
@@ -62,7 +60,5 @@ namespace ElegantJewellery.Controllers
             var response = await _orderService.UpdateOrderStatusAsync(orderId, statusDto);
             return response.Success ? Ok(response) : BadRequest(response);
         }
-
-
     }
 }

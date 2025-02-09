@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ErrorMessage from '../common/ErrorMessage';
+import PasswordInput from '../common/PasswordInput';
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +12,7 @@ const Register = () => {
     email: '',
     phoneNumber: '',
     password: '',
+    confirmPassword: '',
     role: 'User'
   });
 
@@ -20,7 +23,7 @@ const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  const validateField = (name, value) => {
+  const validateField = (name, value, allValues = formData) => {
     let fieldError = '';
     switch (name) {
       case 'firstName':
@@ -28,23 +31,25 @@ const Register = () => {
         if (!value.trim()) {
           fieldError = `${name === 'firstName' ? 'First' : 'Last'} name is required`;
         } else if (value.length < 2) {
-          fieldError = `${name === 'firstName' ? 'First' : 'Last'} name must be at least 3 characters`;
-        } else if (/\d/.test(value)) { 
+          fieldError = `${name === 'firstName' ? 'First' : 'Last'} name must be at least 2 characters`;
+        } else if (/\d/.test(value)) {
           fieldError = `${name === 'firstName' ? 'First' : 'Last'} name cannot contain numbers`;
+        } else if (!/^[a-zA-Z\s]*$/.test(value)) {
+          fieldError = `${name === 'firstName' ? 'First' : 'Last'} name can only contain letters`;
         }
         break;
       case 'email':
         if (!value) {
           fieldError = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(value)) {
-          fieldError = 'Please enter a valid email';
+        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+          fieldError = 'Please enter a valid email address';
         }
         break;
       case 'phoneNumber':
         if (!value) {
           fieldError = 'Phone number is required';
-        } else if (!/^\d{10}$/.test(value.replace(/\D/g, ''))) {
-          fieldError = 'Please enter a valid 10-digit phone number';
+        } else if (!/^[789]\d{9}$/.test(value.replace(/\D/g, ''))) {
+          fieldError = 'Please enter a valid 10-digit phone number starting with 7, 8, or 9';
         }
         break;
       case 'password':
@@ -52,6 +57,19 @@ const Register = () => {
           fieldError = 'Password is required';
         } else if (value.length < 6) {
           fieldError = 'Password must be at least 6 characters';
+        } else if (!/\d/.test(value)) {
+          fieldError = 'Password must contain at least one number';
+        } else if (!/[a-z]/.test(value)) {
+          fieldError = 'Password must contain at least one lowercase letter';
+        } else if (!/[A-Z]/.test(value)) {
+          fieldError = 'Password must contain at least one uppercase letter';
+        }
+        break;
+      case 'confirmPassword':
+        if (!value) {
+          fieldError = 'Please confirm your password';
+        } else if (value !== allValues.password) {
+          fieldError = 'Passwords do not match';
         }
         break;
       default:
@@ -59,7 +77,6 @@ const Register = () => {
     }
     return fieldError;
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,6 +91,17 @@ const Register = () => {
         ...prev,
         [name]: fieldError
       }));
+
+      if (name === 'password' && touched.confirmPassword) {
+        const confirmError = validateField('confirmPassword', formData.confirmPassword, {
+          ...formData,
+          [name]: value
+        });
+        setErrors(prev => ({
+          ...prev,
+          confirmPassword: confirmError
+        }));
+      }
     }
   };
 
@@ -90,10 +118,37 @@ const Register = () => {
     }));
   };
 
+  const formatPhoneNumber = (value) => {
+    const cleaned = value.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+    if (match) {
+      return !match[2] ? match[1] 
+        : !match[3] ? `${match[1]}-${match[2]}`
+        : `${match[1]}-${match[2]}-${match[3]}`;
+    }
+    return cleaned;
+  };
+
+  const handlePhoneChange = (e) => {
+    const formattedNumber = formatPhoneNumber(e.target.value);
+    setFormData(prev => ({
+      ...prev,
+      phoneNumber: formattedNumber
+    }));
+
+    if (touched.phoneNumber) {
+      const fieldError = validateField('phoneNumber', formattedNumber);
+      setErrors(prev => ({
+        ...prev,
+        phoneNumber: fieldError
+      }));
+    }
+  };
+
   const isFormValid = () => {
     const newErrors = {};
     Object.keys(formData).forEach(key => {
-      if (key !== 'role') { // Skip validation for role as it has a default value
+      if (key !== 'role') {
         const fieldError = validateField(key, formData[key]);
         if (fieldError) {
           newErrors[key] = fieldError;
@@ -108,7 +163,6 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    // Touch all fields to show validation messages
     const touchedFields = {};
     Object.keys(formData).forEach(key => {
       touchedFields[key] = true;
@@ -121,7 +175,8 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const result = await register(formData);
+      const { confirmPassword, ...registrationData } = formData;
+      const result = await register(registrationData);
       if (result.success) {
         navigate('/products');
       } else {
@@ -134,14 +189,26 @@ const Register = () => {
     }
   };
 
+  const getPasswordStrength = (password) => {
+    if (password.length === 0) return '';
+    if (password.length < 6) return 'Weak';
+    if (!/\d/.test(password) || !/[a-z]/.test(password) || !/[A-Z]/.test(password)) return 'Medium';
+    return 'Strong';
+  };
+
+  const passwordStrength = getPasswordStrength(formData.password);
+
   return (
-    <div className="container mt-5">
+    <div className="container my-5">
       <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-body">
-              <h2 className="card-title text-center mb-4">Register</h2>
+        <div className="col-md-8 col-lg-6">
+          <div className="card shadow">
+            <div className="card-body p-4">
+              <h2 className="text-center mb-4">Create an Account</h2>
+              <p className="text-center text-muted mb-4">Fill in your details to get started</p>
+
               <ErrorMessage message={error} />
+
               <form onSubmit={handleSubmit} noValidate>
                 <div className="row">
                   <div className="col-md-6 mb-3">
@@ -155,11 +222,14 @@ const Register = () => {
                       value={formData.firstName}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      placeholder="Enter your first name"
+                      autoFocus
                     />
                     {touched.firstName && errors.firstName && (
                       <div className="invalid-feedback">{errors.firstName}</div>
                     )}
                   </div>
+
                   <div className="col-md-6 mb-3">
                     <label htmlFor="lastName" className="form-label">Last Name</label>
                     <input
@@ -171,6 +241,7 @@ const Register = () => {
                       value={formData.lastName}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      placeholder="Enter your last name"
                     />
                     {touched.lastName && errors.lastName && (
                       <div className="invalid-feedback">{errors.lastName}</div>
@@ -189,6 +260,8 @@ const Register = () => {
                     value={formData.email}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    placeholder="Enter your email address"
+                    autoComplete="email"
                   />
                   {touched.email && errors.email && (
                     <div className="invalid-feedback">{errors.email}</div>
@@ -204,55 +277,63 @@ const Register = () => {
                     id="phoneNumber"
                     name="phoneNumber"
                     value={formData.phoneNumber}
-                    onChange={handleChange}
+                    onChange={handlePhoneChange}
                     onBlur={handleBlur}
+                    placeholder="Enter your phone number"
                   />
                   {touched.phoneNumber && errors.phoneNumber && (
                     <div className="invalid-feedback">{errors.phoneNumber}</div>
                   )}
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Password</label>
-                  <input
-                    type="password"
-                    className={`form-control ${touched.password && errors.password ? 'is-invalid' : 
-                      touched.password && !errors.password ? 'is-valid' : ''}`}
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                  />
-                  {touched.password && errors.password && (
-                    <div className="invalid-feedback">{errors.password}</div>
-                  )}
+                <PasswordInput
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={errors.password}
+                  touched={touched.password}
+                  label="Create Password"
+                  placeholder="Create a strong password"
+                />
+
+                <div className="password-strength mb-3">
+                  <div className={`strength-bar ${passwordStrength.toLowerCase()}`}></div>
+                  <span className="strength-text">{passwordStrength}</span>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="role" className="form-label">Role</label>
-                  <select
-                    className="form-select"
-                    id="role"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                  >
-                    <option value="User">User</option>
-                    <option value="Admin">Admin</option>
-                  </select>
-                </div>
+                <PasswordInput
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={errors.confirmPassword}
+                  touched={touched.confirmPassword}
+                  placeholder="Confirm your password"
+                />
 
                 <button
                   type="submit"
-                  className="btn btn-primary w-100 mb-3"
+                  className="btn btn-primary w-100 py-2 mt-3"
                   disabled={loading}
                 >
-                  {loading ? 'Registering...' : 'Register'}
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Creating Account...
+                    </>
+                  ) : (
+                    'Create Account'
+                  )}
                 </button>
 
-                <div className="text-center">
-                  Already have an account? <Link to="/login">Login here</Link>
+                <div className="text-center mt-4">
+                  <p className="mb-0">
+                    Already have an account?{' '}
+                    <Link to="/login" className="text-primary text-decoration-none">
+                      Sign in
+                    </Link>
+                  </p>
                 </div>
               </form>
             </div>

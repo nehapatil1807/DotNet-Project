@@ -1,4 +1,3 @@
-// src/components/layout/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
@@ -53,7 +52,7 @@ const Footer = () => {
                     className="form-control me-2" 
                     placeholder="Your email address"
                   />
-                  <button className="btn btn-outline-light" type="submit">
+                  <button className="btn btn-outline-gold" type="submit">
                     Subscribe
                   </button>
                 </form>

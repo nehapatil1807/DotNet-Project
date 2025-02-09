@@ -23,6 +23,9 @@ namespace ElegantJewellery.Services
             _mapper = mapper;
         }
 
+       
+
+
         public async Task<ApiResponse<IEnumerable<ProductResponseDto>>> GetAllProductsAsync()
         {
             try

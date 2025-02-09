@@ -45,7 +45,7 @@ const OrderTracking = () => {
   useEffect(() => {
     fetchOrderDetails();
     // Set up polling for status updates
-    const interval = setInterval(fetchOrderDetails, 30000); // Poll every 30 seconds
+    const interval = setInterval(fetchOrderDetails, 30000);
     return () => clearInterval(interval);
   }, [id]);
 
@@ -76,7 +76,7 @@ const OrderTracking = () => {
     
     const orderDate = new Date(order.orderDate);
     const deliveryDate = new Date(orderDate);
-    deliveryDate.setDate(deliveryDate.getDate() + 5); // Estimate 5 days for delivery
+    deliveryDate.setDate(deliveryDate.getDate() + 5);
     
     return deliveryDate.toLocaleDateString('en-IN', {
       weekday: 'long',

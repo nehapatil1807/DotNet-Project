@@ -5,7 +5,7 @@ import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
   const handleImageError = (e) => {
-    e.target.src = '/placeholder.jpg'; // Fallback image
+    e.target.src = '/placeholder.jpg'; 
   };
 
   const calculateDiscount = () => {

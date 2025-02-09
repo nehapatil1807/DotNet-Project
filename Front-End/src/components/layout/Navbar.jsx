@@ -56,7 +56,7 @@ const Navbar = () => {
       const filtered = products.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
-      ).slice(0, 5); // Limit to 5 suggestions
+      ).slice(0, 5); 
       setSuggestions(filtered);
       setShowSuggestions(true);
     } else {

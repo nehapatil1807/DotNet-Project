@@ -1,17 +1,16 @@
-/* src/styles/theme.css */
 
 :root {
 
 
   /* Brand Colors */
-  --primary: #B4833E;  /* Luxury gold */
+  --primary: #B4833E; 
   --primary-dark: #96682D;
   --primary-light: #D4A86C;
   
   /* Accent Colors */
-  --accent-1: #2C3E50;  /* Deep navy */
-  --accent-2: #8B4513;  /* Saddle brown */
-  --accent-3: #4A4A4A;  /* Charcoal */
+  --accent-1: #2C3E50; 
+  --accent-2: #8B4513; 
+  --accent-3: #4A4A4A; 
   
   /* Neutral Colors */
   --neutral-100: #FFFFFF;

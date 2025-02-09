@@ -1,4 +1,3 @@
-// src/components/common/ProductImage.jsx
 
 import React, { useState } from 'react';
 

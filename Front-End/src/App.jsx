@@ -1,20 +1,20 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { OrderProvider } from './context/OrderContext';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { RouteGuard, AdminRoute, CustomerRoute, GuestRoute } from './components/routes/RouteGuard';
+
+// Layouts
+import AdminLayout from './components/admin/layout/AdminLayout';
+import CustomerLayout from './components/layout/CustomerLayout';
 
 // Admin Components
-import AdminLayout from './components/admin/layout/AdminLayout';
 import AdminDashboard from './components/admin/dashboard/AdminDashboard';
 import AdminProducts from './components/admin/products/AdminProducts';
 import AdminOrders from './components/admin/orders/AdminOrders';
 
 // Customer Components
-import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
 import HomePage from './components/home/Homepage';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
@@ -25,68 +25,13 @@ import Checkout from './components/checkout/Checkout';
 import OrderList from './components/orders/OrderList';
 import OrderDetails from './components/orders/OrderDetails';
 import OrderTracking from './components/orders/OrderTracking';
-import Loading from './components/common/Loading';
 
 // Styles
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/HomePage.css';
 import './styles/ProductCard.css';
 import './styles/admin.css';
 import './styles/theme.css';
-
-const AdminRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (!user || user.role !== 'Admin') {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-};
-
-const PrivateRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-};
-
-const GuestRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (user) {
-    return <Navigate to={user.role === 'Admin' ? '/admin/dashboard' : '/'} replace />;
-  }
-
-  return children;
-};
-
-const CustomerLayout = ({ children }) => {
-  const { user } = useAuth();
-  return (
-    <div className="d-flex flex-column min-vh-100">
-      <Navbar />
-      <main className="flex-grow-1">
-        {children}
-      </main>
-      <Footer />
-    </div>
-  );
-};
 
 const App = () => {
   return (
@@ -134,81 +79,97 @@ const App = () => {
                 }
               />
 
-              {/* Customer Routes */}
-              <Route
-                path="/"
-                element={
-                  <CustomerLayout>
-                    <HomePage />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/products"
-                element={
-                  <CustomerLayout>
-                    <ProductList />
-                  </CustomerLayout>
-                }
-              />
-              <Route
-                path="/products/:id"
-                element={
-                  <CustomerLayout>
-                    <ProductDetails />
-                  </CustomerLayout>
-                }
-              />
+             {/* Public Routes */}
+<Route
+  path="/"
+  element={
+    <RouteGuard path="/">
+      <CustomerLayout>
+        <HomePage />
+      </CustomerLayout>
+    </RouteGuard>
+  }
+/>
+<Route
+  path="/products"
+  element={
+    <RouteGuard path="/products">
+      <CustomerLayout>
+        <ProductList />
+      </CustomerLayout>
+    </RouteGuard>
+  }
+/>
+<Route
+  path="/products/:id"
+  element={
+    <RouteGuard path="/products">
+      <CustomerLayout>
+        <ProductDetails />
+      </CustomerLayout>
+    </RouteGuard>
+  }
+/>
 
               {/* Protected Customer Routes */}
               <Route
                 path="/cart"
                 element={
-                  <PrivateRoute>
-                    <CustomerLayout>
-                      <Cart />
-                    </CustomerLayout>
-                  </PrivateRoute>
+                  <RouteGuard path="/cart">
+                    <CustomerRoute>
+                      <CustomerLayout>
+                        <Cart />
+                      </CustomerLayout>
+                    </CustomerRoute>
+                  </RouteGuard>
                 }
               />
               <Route
                 path="/checkout"
                 element={
-                  <PrivateRoute>
-                    <CustomerLayout>
-                      <Checkout />
-                    </CustomerLayout>
-                  </PrivateRoute>
+                  <RouteGuard path="/checkout">
+                    <CustomerRoute>
+                      <CustomerLayout>
+                        <Checkout />
+                      </CustomerLayout>
+                    </CustomerRoute>
+                  </RouteGuard>
                 }
               />
               <Route
                 path="/orders"
                 element={
-                  <PrivateRoute>
-                    <CustomerLayout>
-                      <OrderList />
-                    </CustomerLayout>
-                  </PrivateRoute>
+                  <RouteGuard path="/orders">
+                    <CustomerRoute>
+                      <CustomerLayout>
+                        <OrderList />
+                      </CustomerLayout>
+                    </CustomerRoute>
+                  </RouteGuard>
                 }
               />
               <Route
                 path="/orders/:id"
                 element={
-                  <PrivateRoute>
-                    <CustomerLayout>
-                      <OrderDetails />
-                    </CustomerLayout>
-                  </PrivateRoute>
+                  <RouteGuard path="/orders">
+                    <CustomerRoute>
+                      <CustomerLayout>
+                        <OrderDetails />
+                      </CustomerLayout>
+                    </CustomerRoute>
+                  </RouteGuard>
                 }
               />
               <Route
                 path="/order-tracking/:id"
                 element={
-                  <PrivateRoute>
-                    <CustomerLayout>
-                      <OrderTracking />
-                    </CustomerLayout>
-                  </PrivateRoute>
+                  <RouteGuard path="/order-tracking">
+                    <CustomerRoute>
+                      <CustomerLayout>
+                        <OrderTracking />
+                      </CustomerLayout>
+                    </CustomerRoute>
+                  </RouteGuard>
                 }
               />
 
@@ -216,9 +177,8 @@ const App = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
 
-            {/* Toast Container for notifications */}
             <ToastContainer
-              position="top-right"
+              position="bottom-right"
               autoClose={3000}
               hideProgressBar={false}
               newestOnTop

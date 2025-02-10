@@ -85,16 +85,21 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     if (!isFormValid()) {
       return;
     }
-
+  
     setLoading(true);
     try {
       const result = await login(formData);
       if (result.success) {
-        navigate('/products');
+        
+        if (result.user.role === 'Admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         setError(result.message);
       }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { toast } from 'react-toastify';
 import { orderService } from '../../../services/orderService';
 import { productService } from '../../../services/productService';
 import { formatPrice } from '../../../utils/formatters';
@@ -16,6 +17,7 @@ const AdminDashboard = () => {
     monthlyRevenue: []
   });
   const [loading, setLoading] = useState(true);
+  const [timeframe, setTimeframe] = useState('week');
 
   useEffect(() => {
     fetchDashboardData();
@@ -47,6 +49,7 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -66,17 +69,17 @@ const AdminDashboard = () => {
         revenue: amount
       }))
       .sort((a, b) => a.month.localeCompare(b.month))
-      .slice(-6); // Last 6 months
+      .slice(-6);
   };
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case 'pending': return 'warning';
-      case 'processing': return 'info';
-      case 'shipped': return 'primary';
-      case 'delivered': return 'success';
-      case 'cancelled': return 'danger';
-      default: return 'secondary';
+      case 'pending': return 'pending';
+      case 'processing': return 'processing';
+      case 'shipped': return 'completed';
+      case 'delivered': return 'completed';
+      case 'cancelled': return 'cancelled';
+      default: return 'pending';
     }
   };
 
@@ -91,205 +94,206 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="container-fluid p-0">
-      {/* Stats Cards */}
-      <div className="row g-4 mb-4">
-        <div className="col-sm-6 col-xl-3">
-          <div className="card bg-primary text-white h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <i className="bi bi-cart3 fs-1"></i>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="mb-0">Total Orders</h6>
-                  <h2 className="mb-0">{stats.totalOrders}</h2>
-                </div>
-              </div>
-            </div>
+    <div className="dashboard-content">
+      {/* Stats Grid */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon revenue">
+            <i className="bi bi-currency-dollar"></i>
+          </div>
+          <div className="stat-value">{formatPrice(stats.totalRevenue)}</div>
+          <div className="stat-label">Total Revenue</div>
+          <div className="stat-change positive">
+            <i className="bi bi-arrow-up"></i>
+            <span>12.5% vs last month</span>
           </div>
         </div>
 
-        <div className="col-sm-6 col-xl-3">
-          <div className="card bg-success text-white h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <i className="bi bi-currency-dollar fs-1"></i>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="mb-0">Total Revenue</h6>
-                  <h2 className="mb-0">{formatPrice(stats.totalRevenue)}</h2>
-                </div>
-              </div>
-            </div>
+        <div className="stat-card">
+          <div className="stat-icon orders">
+            <i className="bi bi-cart3"></i>
+          </div>
+          <div className="stat-value">{stats.totalOrders}</div>
+          <div className="stat-label">Total Orders</div>
+          <div className="stat-change positive">
+            <i className="bi bi-arrow-up"></i>
+            <span>8.2% vs last month</span>
           </div>
         </div>
 
-        <div className="col-sm-6 col-xl-3">
-          <div className="card bg-info text-white h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <i className="bi bi-box-seam fs-1"></i>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="mb-0">Total Products</h6>
-                  <h2 className="mb-0">{stats.totalProducts}</h2>
-                </div>
-              </div>
-            </div>
+        <div className="stat-card">
+          <div className="stat-icon products">
+            <i className="bi bi-box-seam"></i>
+          </div>
+          <div className="stat-value">{stats.totalProducts}</div>
+          <div className="stat-label">Total Products</div>
+          <div className="stat-change negative">
+            <i className="bi bi-arrow-down"></i>
+            <span>3.1% vs last month</span>
           </div>
         </div>
 
-        <div className="col-sm-6 col-xl-3">
-          <div className="card bg-warning text-dark h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-shrink-0">
-                  <i className="bi bi-exclamation-triangle fs-1"></i>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <h6 className="mb-0">Low Stock Items</h6>
-                  <h2 className="mb-0">{stats.lowStockProducts.length}</h2>
-                </div>
-              </div>
-            </div>
+        <div className="stat-card">
+          <div className="stat-icon customers">
+            <i className="bi bi-people"></i>
+          </div>
+          <div className="stat-value">{stats.lowStockProducts.length}</div>
+          <div className="stat-label">Low Stock Items</div>
+          <div className="stat-change negative">
+            <i className="bi bi-arrow-up"></i>
+            <span>5 items need attention</span>
           </div>
         </div>
       </div>
 
-      {/* Revenue Chart */}
-      <div className="card mb-4">
-        <div className="card-header">
-          <h5 className="card-title mb-0">Revenue Trend</h5>
-        </div>
-        <div className="card-body">
+      {/* Charts Row */}
+      <div className="charts-row">
+        {/* Revenue Chart */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h5 className="chart-title">Revenue Overview</h5>
+            <div className="chart-filters">
+              <button 
+                className={`chart-filter ${timeframe === 'week' ? 'active' : ''}`}
+                onClick={() => setTimeframe('week')}
+              >
+                Week
+              </button>
+              <button 
+                className={`chart-filter ${timeframe === 'month' ? 'active' : ''}`}
+                onClick={() => setTimeframe('month')}
+              >
+                Month
+              </button>
+              <button 
+                className={`chart-filter ${timeframe === 'year' ? 'active' : ''}`}
+                onClick={() => setTimeframe('year')}
+              >
+                Year
+              </button>
+            </div>
+          </div>
           <div style={{ height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={stats.monthlyRevenue}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis 
+                  dataKey="month"
+                  tickFormatter={(value) => {
+                    const [year, month] = value.split('-');
+                    return new Date(year, month - 1).toLocaleString('default', { month: 'short' });
+                  }}
+                />
                 <YAxis />
                 <Tooltip 
                   formatter={(value) => formatPrice(value)}
                   labelFormatter={(label) => {
                     const [year, month] = label.split('-');
-                    return `${new Date(year, month - 1).toLocaleString('default', { month: 'long' })} ${year}`;
+                    return new Date(year, month - 1).toLocaleString('default', { 
+                      month: 'long',
+                      year: 'numeric'
+                    });
                   }}
                 />
-                <Line type="monotone" dataKey="revenue" stroke="#0d6efd" />
+                <Line 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#B4833E" 
+                  strokeWidth={2}
+                  dot={{ fill: '#B4833E', strokeWidth: 2 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
-
-      <div className="row">
-        {/* Recent Orders */}
-        <div className="col-12 col-xl-8 mb-4">
-          <div className="card h-100">
-            <div className="card-header d-flex justify-content-between align-items-center">
-              <h5 className="card-title mb-0">Recent Orders</h5>
-              <Link to="/admin/orders" className="btn btn-primary btn-sm">View All</Link>
-            </div>
-            <div className="card-body p-0">
-              <div className="table-responsive">
-                <table className="table table-hover mb-0">
-                  <thead>
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Customer</th>
-                      <th>Status</th>
-                      <th>Date</th>
-                      <th>Amount</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stats.recentOrders.map((order) => (
-                      <tr key={order.id}>
-                        <td>#{order.id}</td>
-                        <td>{order.userName}</td>
-                        <td>
-                          <span className={`badge bg-${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
-                        </td>
-                        <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                        <td>{formatPrice(order.totalAmount)}</td>
-                        <td>
-                          <Link 
-                            to={`/admin/orders/${order.id}`}
-                            className="btn btn-sm btn-outline-primary"
-                          >
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Low Stock Products */}
-        <div className="col-12 col-xl-4 mb-4">
-          <div className="card h-100">
-            <div className="card-header d-flex justify-content-between align-items-center">
-              <h5 className="card-title mb-0">Low Stock Products</h5>
-              <Link to="/admin/products" className="btn btn-primary btn-sm">Manage Stock</Link>
-            </div>
-            <div className="card-body p-0">
-              <div className="table-responsive">
-                <table className="table table-hover mb-0">
-                  <thead>
-                    <tr>
-                      <th>Product</th>
-                      <th>Stock</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stats.lowStockProducts.map((product) => (
-                      <tr key={product.id}>
-                        <td>
-                          <div className="d-flex align-items-center">
-                            <img
-                              src={product.imageUrl}
-                              alt={product.name}
-                              className="rounded me-2"
-                              style={{ width: '32px', height: '32px', objectFit: 'cover' }}
-                              onError={(e) => { e.target.src = '/placeholder.jpg' }}
-                            />
-                            <div>
-                              <div className="text-truncate" style={{ maxWidth: '150px' }}>
-                                {product.name}
-                              </div>
-                              <small className="text-muted">{product.categoryName}</small>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <span className="badge bg-danger">{product.stock}</span>
-                        </td>
-                        <td>
-                          <Link 
-                            to={`/admin/products/${product.id}`}
-                            className="btn btn-sm btn-outline-warning"
-                          >
-                            Update
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        <div className="low-stock-card">
+          <div className="orders-header">
+            <h5 className="chart-title">Low Stock Products</h5>
+            <Link to="/admin/products" className="btn btn-sm btn-primary">
+              View All
+            </Link>
           </div>
+          <div className="orders-list">
+            {stats.lowStockProducts.map((product) => (
+              <div key={product.id} className="low-stock-item">
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="admin-product-image"
+                  onError={(e) => { e.target.src = '/placeholder.jpg' }}
+                />
+                <div className="flex-grow-1">
+                  <h6 className="mb-1">{product.name}</h6>
+                  <small className="text-muted">{product.categoryName}</small>
+                </div>
+                <span className="stock-badge">
+                  {product.stock} left
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Orders */}
+      <div className="orders-card">
+        <div className="orders-header">
+          <h5 className="chart-title">Recent Orders</h5>
+          <Link to="/admin/orders" className="btn btn-sm btn-primary">
+            View All Orders
+          </Link>
+        </div>
+        <div className="table-responsive">
+          <table className="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>#{order.id}</td>
+                  <td>
+                    <div className="d-flex flex-column">
+                      <span>{order.userName}</span>
+                      <small className="text-muted">{order.shippingDetails.phone}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td>
+                    {new Date(order.orderDate).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </td>
+                  <td>
+                    <strong>{formatPrice(order.totalAmount)}</strong>
+                  </td>
+                  <td>
+                    <Link 
+                      to={`/admin/orders/${order.id}`}
+                      className="btn btn-sm btn-outline-primary"
+                    >
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

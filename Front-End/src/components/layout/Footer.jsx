@@ -75,12 +75,7 @@ const Footer = () => {
               <p className="mb-0">© {new Date().getFullYear()} Elegant Jewellery. All rights reserved.</p>
             </div>
             <div className="col-md-6 text-center text-md-end">
-              <img 
-                src="/payment-methods.png" 
-                alt="Payment Methods" 
-                className="payment-methods"
-                height="30"
-              />
+              
             </div>
           </div>
         </div>

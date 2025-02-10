@@ -1,16 +1,17 @@
+/* src/styles/theme.css */
 
 :root {
 
 
   /* Brand Colors */
-  --primary: #B4833E; 
+  --primary: #B4833E;  /* Luxury gold */
   --primary-dark: #96682D;
   --primary-light: #D4A86C;
   
   /* Accent Colors */
-  --accent-1: #2C3E50; 
-  --accent-2: #8B4513; 
-  --accent-3: #4A4A4A; 
+  --accent-1: #2C3E50;  /* Deep navy */
+  --accent-2: #8B4513;  /* Saddle brown */
+  --accent-3: #4A4A4A;  /* Charcoal */
   
   /* Neutral Colors */
   --neutral-100: #FFFFFF;
@@ -75,6 +76,16 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
+
+.btn-primary:active {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+
+
 
 /* Cards */
 .card {

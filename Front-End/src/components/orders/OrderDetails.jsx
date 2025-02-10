@@ -29,85 +29,23 @@ const OrderDetails = () => {
     }
   };
 
-  const orderSteps = [
-    { status: 'PLACED', label: 'Placed' },
-    { status: 'CONFIRMED', label: 'Confirmed' },
-    { status: 'SHIPPED', label: 'Shipped' },
-    { status: 'DELIVERED', label: 'Delivered' }
-  ];
-
-  const getCurrentStepIndex = () => {
-    return orderSteps.findIndex(step => step.status === order?.status) || 0;
-  };
-
   if (loading) return <Loading />;
   if (!order) return <div>Order not found</div>;
-
-  const currentStep = getCurrentStepIndex();
 
   return (
     <div className="container py-4">
       <div className="card">
         <div className="card-body">
-          <div className="text-primary mb-2">ORDER CONFIRMED SUCCESSFULLY</div>
-          <h2 className="mb-3">Track Your Order</h2>
-          <p className="text-muted mb-4">
-            We appreciate your order, we're currently processing it. So hang tight and we'll send you confirmation very soon!
-          </p>
-
-          {/* Tracking Number */}
+          {/* Order Tracking Number */}
           <div className="mb-4">
-            <p className="text-muted mb-1">Tracking number</p>
+            <p className="text-muted mb-1">Order Tracking Number</p>
             <div className="h5 text-primary">#{order.id}</div>
-          </div>
-
-          {/* Order Progress */}
-          <div className="position-relative mb-5">
-            <div className="progress" style={{ height: '2px' }}>
-              <div 
-                className="progress-bar" 
-                role="progressbar" 
-                style={{ width: `${(currentStep / (orderSteps.length - 1)) * 100}%` }}
-              />
-            </div>
-
-            <div className="d-flex justify-content-between position-relative">
-              {orderSteps.map((step, index) => {
-                const isCompleted = index <= currentStep;
-                const isCurrent = index === currentStep;
-                
-                return (
-                  <div key={step.status} className="text-center" style={{ width: '120px', marginTop: '-10px' }}>
-                    <div 
-                      className={`rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center ${
-                        isCompleted ? 'bg-primary' : 'bg-light'
-                      }`}
-                      style={{ 
-                        width: '24px', 
-                        height: '24px',
-                        border: isCurrent ? '2px solid #0d6efd' : 'none'
-                      }}
-                    >
-                      {isCompleted ? (
-                        <i className="bi bi-check text-white small"></i>
-                      ) : (
-                        <span className={`small ${isCurrent ? 'text-primary' : 'text-muted'}`}>
-                          {index + 1}
-                        </span>
-                      )}
-                    </div>
-                    <div className={isCompleted ? 'text-primary' : 'text-muted'}>
-                      {step.label}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
           {/* Order Items */}
           <div className="card mb-4">
             <div className="card-body">
+              <h5 className="mb-3">Order Items</h5>
               {order.items.map((item) => (
                 <div key={item.id} className="d-flex align-items-center mb-3">
                   <img
@@ -131,7 +69,7 @@ const OrderDetails = () => {
 
               <hr />
 
-              {/* Order Summary */}
+              {/* Summary: Shipping Details & Order Summary */}
               <div className="row">
                 <div className="col-md-6">
                   <h6 className="mb-2">Shipping Details</h6>
@@ -168,7 +106,7 @@ const OrderDetails = () => {
 
           {/* Action Buttons */}
           <div className="d-flex justify-content-end gap-2">
-            <Link to="/orders" className="btn btn-outline-primary">
+            <Link to="/orders" className="btn btn-outline-secondary">
               Back to Orders
             </Link>
             <Link to="/products" className="btn btn-primary">

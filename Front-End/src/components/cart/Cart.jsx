@@ -100,7 +100,7 @@ const Cart = () => {
             <div className="card-header bg-white py-3">
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="mb-0">Shopping Cart ({cart.items.length} items)</h5>
-                <Link to="/products" className="btn btn-link text-decoration-none">
+                <Link to="/products" className="btn btn-link text-decoration-none" style={{ color: '#212529'}}>
                   Continue Shopping
                 </Link>
               </div>
@@ -110,8 +110,15 @@ const Cart = () => {
                 <div key={item.id} className="cart-item mb-4 pb-4 border-bottom">
                   <div className="row align-items-center">
                     <div className="col-md-2 mb-3 mb-md-0">
+                    <img
+    src={item.imageUrl || '/placeholder.jpg'}
+    alt={item.productName}
+    className="rounded me-3"
+    style={{ width: '64px', height: '64px', objectFit: 'cover' }}
+    onError={(e) => { e.target.src = '/placeholder.jpg' }}
+/>
                       <Link to={`/products/${item.productId}`}>
-                      <CartItemImage product={item} />
+
                       </Link>
                     </div>
                     <div className="col-md-4 mb-3 mb-md-0">

@@ -15,8 +15,7 @@ const PAYMENT_METHODS = [
 const STEPS = [
   { key: 'shipping', label: 'Shipping', icon: 'bi-truck' },
   { key: 'payment', label: 'Payment', icon: 'bi-credit-card' },
-  { key: 'review', label: 'Review', icon: 'bi-list-check' },
-  { key: 'confirmation', label: 'Confirmation', icon: 'bi-check-circle' }
+  { key: 'review', label: 'Review', icon: 'bi-list-check' }
 ];
 
 const Checkout = () => {
@@ -228,19 +227,18 @@ const Checkout = () => {
           city: shippingDetails.city,
           state: shippingDetails.state,
           pincode: shippingDetails.pincode,
-          phone: shippingDetails.phone.replace(/-/g, '') // Remove hyphens from phone number
+          phone: shippingDetails.phone.replace(/-/g, '')
         },
         paymentMethod
       };
-
+  
       const result = await createOrder(orderData);
       
       if (result.success) {
+        navigate(`/order-tracking/${result.order.id}`);
         await clearCart();
-        setActiveStep('confirmation');
-        setTimeout(() => {
-          navigate(`/order-tracking/${result.order.id}`);
-        }, 2000);
+        // Direct navigation to order tracking
+        
       } else {
         toast.error(result.message || 'Failed to place order');
       }
@@ -535,10 +533,12 @@ const Checkout = () => {
           </div>
 
           {activeStep !== 'confirmation' && (
-            <div className="d-flex justify-content-between">
+            <div className="d-flex flex-column flex-sm-row justify-content-between gap-3">
               {activeStep !== 'shipping' ? (
+                
                 <button
-                  className="btn btn-outline-primary"
+                style={{ marginTop: '50px'}}
+                  className="btn btn-outline-secondary order-2 order-sm-1 w-100 w-sm-auto"
                   onClick={() => {
                     const currentIndex = STEPS.findIndex(s => s.key === activeStep);
                     setActiveStep(STEPS[currentIndex - 1].key);
@@ -549,7 +549,8 @@ const Checkout = () => {
                 </button>
               ) : (
                 <button
-                  className="btn btn-outline-primary"
+                  className="btn btn-outline-secondary order-2 order-sm-1 w-100 w-sm-auto"
+                  style={{ marginTop: '50px'}}
                   onClick={() => navigate('/cart')}
                 >
                   <i className="bi bi-arrow-left me-2"></i>
@@ -558,7 +559,8 @@ const Checkout = () => {
               )}
 
               <button
-                className="btn btn-primary"
+                className="btn btn-primary order-1 order-sm-2 w-100 w-sm-auto"
+                style={{ marginTop: '50px'}}
                 onClick={handleStepSubmit}
                 disabled={processing}
               >

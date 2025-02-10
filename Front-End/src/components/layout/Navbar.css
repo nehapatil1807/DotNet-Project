@@ -1,3 +1,4 @@
+/* src/components/layout/Navbar.css */
 
 .navbar {
   padding: 1rem 0;
@@ -79,8 +80,8 @@
 }
 
 .suggestion-image {
-  width: 40px; 
-  height: 40px; 
+  width: 40px;  /* Reduced from previous size */
+  height: 40px;  /* Reduced from previous size */
   border-radius: 4px;
   object-fit: cover;
   flex-shrink: 0;
@@ -88,11 +89,11 @@
 
 .suggestion-details {
   flex: 1;
-  min-width: 0; 
+  min-width: 0;  /* Allows text truncation to work */
 }
 
 .suggestion-name {
-  font-size: 0.875rem; 
+  font-size: 0.875rem;  /* Reduced font size */
   font-weight: 500;
   color: var(--neutral-800);
   margin-bottom: 0.25rem;
@@ -102,20 +103,20 @@
 }
 
 .suggestion-category {
-  font-size: 0.75rem; 
+  font-size: 0.75rem;  /* Smaller font size for category */
   color: var(--neutral-600);
   margin-bottom: 0.25rem;
 }
 
 .suggestion-price {
-  font-size: 0.875rem; 
+  font-size: 0.875rem;  /* Consistent with name size */
   font-weight: 600;
   color: var(--primary);
 }
 
 /* Custom scrollbar for suggestions */
 .search-suggestions::-webkit-scrollbar {
-  width: 6px;  
+  width: 6px;  /* Thinner scrollbar */
 }
 
 .search-suggestions::-webkit-scrollbar-track {

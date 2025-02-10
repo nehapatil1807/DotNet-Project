@@ -1,5 +1,6 @@
 ﻿using ElegantJewellery.Models;
 using Microsoft.EntityFrameworkCore;
+
 namespace ElegantJewellery.Data
 {
     public class ApplicationDbContext : DbContext
@@ -57,6 +58,20 @@ namespace ElegantJewellery.Data
                 .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId);
 
+            // Seed Admin User
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    FirstName = "Pratik",
+                    LastName = "Shahane",
+                    Email = "pratik26198@gmail.com",
+                    PhoneNumber = "9158347091",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pratik@123"),
+                    Role = "Admin"
+                }
+            );
+
             // Seed Categories
             modelBuilder.Entity<Category>().HasData(
                 new Category
@@ -86,88 +101,86 @@ namespace ElegantJewellery.Data
             );
 
             modelBuilder.Entity<Product>().HasData(
-        // Rings (Category 1)
-        new Product
-        {
-            Id = 1,
-            Name = "Diamond Solitaire Ring",
-            Price = 124499,
-            Stock = 10,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1710406122399.jpeg",
-            CategoryId = 1
-        },
-        new Product
-        {
-            Id = 2,
-            Name = "Rose Gold Wedding Band",
-            Price = 66399,
-            Stock = 15,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1710404013885.jpeg",
-            CategoryId = 1
-        },
+                // Rings (Category 1)
+                new Product
+                {
+                    Id = 1,
+                    Name = "Diamond Solitaire Ring",
+                    Price = 124499,
+                    Stock = 10,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1710406122399.jpeg",
+                    CategoryId = 1
+                },
+                new Product
+                {
+                    Id = 2,
+                    Name = "Rose Gold Wedding Band",
+                    Price = 66399,
+                    Stock = 15,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1710404013885.jpeg",
+                    CategoryId = 1
+                },
 
-        // Necklaces (Category 2)
-        new Product
-        {
-            Id = 3,
-            Name = "Pearl Pendant Necklace",
-            Price = 49799,
-            Stock = 8,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1711022791462.jpeg",
-            CategoryId = 2
-        },
-        new Product
-        {
-            Id = 4,
-            Name = "Gold Chain Necklace",
-            Price = 74699,
-            Stock = 12,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1734852671201.jpeg",
-            CategoryId = 2
-        },
+                // Necklaces (Category 2)
+                new Product
+                {
+                    Id = 3,
+                    Name = "Pearl Pendant Necklace",
+                    Price = 49799,
+                    Stock = 8,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1711022791462.jpeg",
+                    CategoryId = 2
+                },
+                new Product
+                {
+                    Id = 4,
+                    Name = "Gold Chain Necklace",
+                    Price = 74699,
+                    Stock = 12,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1734852671201.jpeg",
+                    CategoryId = 2
+                },
 
-        // Earrings (Category 3)
-        new Product
-        {
-            Id = 5,
-            Name = "Diamond Stud Earrings",
-            Price = 82999,
-            Stock = 10,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1722072430751.jpeg",
-            CategoryId = 3
-        },
-        new Product
-        {
-            Id = 6,
-            Name = "Sapphire Drop Earrings",
-            Price = 107899,
-            Stock = 6,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1719922648757.jpeg",
-            CategoryId = 3
-        },
+                // Earrings (Category 3)
+                new Product
+                {
+                    Id = 5,
+                    Name = "Diamond Stud Earrings",
+                    Price = 82999,
+                    Stock = 10,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1722072430751.jpeg",
+                    CategoryId = 3
+                },
+                new Product
+                {
+                    Id = 6,
+                    Name = "Sapphire Drop Earrings",
+                    Price = 107899,
+                    Stock = 6,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1719922648757.jpeg",
+                    CategoryId = 3
+                },
 
-        // Bracelets (Category 4)
-        new Product
-        {
-            Id = 7,
-            Name = "Tennis Bracelet",
-            Price = 207499,
-            Stock = 5,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1689066649407.jpeg",
-            CategoryId = 4
-        },
-        new Product
-        {
-            Id = 8,
-            Name = "Charm Bracelet",
-            Price = 33199,
-            Stock = 20,
-            ImageUrl = "https://cdn.bradojewellery.com/p/540x/1691123242398.jpeg",
-            CategoryId = 4
-        }
-
-        );
-
+                // Bracelets (Category 4)
+                new Product
+                {
+                    Id = 7,
+                    Name = "Tennis Bracelet",
+                    Price = 207499,
+                    Stock = 5,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1689066649407.jpeg",
+                    CategoryId = 4
+                },
+                new Product
+                {
+                    Id = 8,
+                    Name = "Charm Bracelet",
+                    Price = 33199,
+                    Stock = 20,
+                    ImageUrl = "https://cdn.bradojewellery.com/p/540x/1691123242398.jpeg",
+                    CategoryId = 4
+                }
+            );
         }
     }
 }

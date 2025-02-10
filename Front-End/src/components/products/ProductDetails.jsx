@@ -141,7 +141,8 @@ const ProductDetails = () => {
               className="w-100 h-100 object-fit-cover"
               style={{ 
                 minHeight: '500px',
-                opacity: imageLoaded ? 1 : 0,
+                objectFit: 'cover',
+                borderRadius: '0.5rem',
                 transition: 'opacity 0.3s ease'
               }}
               onLoad={() => setImageLoaded(true)}

@@ -267,7 +267,7 @@ const OrderList = () => {
                     <div className="btn-group">
                       <Link 
                         to={`/order-tracking/${order.id}`}
-                        className="btn btn-outline-primary btn-sm"
+                        className="btn btn-outline-secondary btn-sm"
                       >
                         Track Order
                       </Link>

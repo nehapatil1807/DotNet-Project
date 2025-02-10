@@ -8,12 +8,16 @@
   }
   
   .order-items img {
+    max-width: 100px; /* Set a maximum width */
+    max-height: 100px; /* Set a maximum height */
+    width: auto; /* Maintain aspect ratio */
+    height: auto; /* Maintain aspect ratio */
     transition: transform 0.3s ease;
-  }
-  
-  .order-items img:hover {
+}
+
+.order-items img:hover {
     transform: scale(1.1);
-  }
+}
   
   /* Status colors */
   .text-warning i {

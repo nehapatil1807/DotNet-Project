@@ -216,6 +216,11 @@ namespace ElegantJewellery.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Email", "FirstName", "LastName", "PasswordHash", "PhoneNumber", "Role" },
+                values: new object[] { 1, "pratik26198@gmail.com", "Pratik", "Shahane", "$2a$11$.0nGCjbvBzq94uodYfAw9ul.zxXTtHllWqhH2Xt8jyoYziQTV8WuC", "9158347091", "Admin" });
+
+            migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "Id", "CategoryId", "ImageUrl", "Name", "Price", "Stock" },
                 values: new object[,]

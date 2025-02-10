@@ -350,6 +350,18 @@ namespace ElegantJewellery.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "pratik26198@gmail.com",
+                            FirstName = "Pratik",
+                            LastName = "Shahane",
+                            PasswordHash = "$2a$11$.0nGCjbvBzq94uodYfAw9ul.zxXTtHllWqhH2Xt8jyoYziQTV8WuC",
+                            PhoneNumber = "9158347091",
+                            Role = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("ElegantJewellery.Models.Cart", b =>

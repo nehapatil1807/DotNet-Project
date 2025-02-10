@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\prati\\OneDrive\\Desktop\\MyProjects\\DotNet-Project\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj": {}
+    "C:\\Users\\prati\\OneDrive\\Desktop\\DotNet-Project-main\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj": {}
   },
   "projects": {
-    "C:\\Users\\prati\\OneDrive\\Desktop\\MyProjects\\DotNet-Project\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj": {
+    "C:\\Users\\prati\\OneDrive\\Desktop\\DotNet-Project-main\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\prati\\OneDrive\\Desktop\\MyProjects\\DotNet-Project\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj",
+        "projectUniqueName": "C:\\Users\\prati\\OneDrive\\Desktop\\DotNet-Project-main\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj",
         "projectName": "ElegantJewellery",
-        "projectPath": "C:\\Users\\prati\\OneDrive\\Desktop\\MyProjects\\DotNet-Project\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj",
+        "projectPath": "C:\\Users\\prati\\OneDrive\\Desktop\\DotNet-Project-main\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj",
         "packagesPath": "C:\\Users\\prati\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\prati\\OneDrive\\Desktop\\MyProjects\\DotNet-Project\\Back-End\\ElegantJewellery\\obj\\",
+        "outputPath": "C:\\Users\\prati\\OneDrive\\Desktop\\DotNet-Project-main\\Back-End\\ElegantJewellery\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

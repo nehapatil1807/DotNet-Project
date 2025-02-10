@@ -12,14 +12,14 @@ const HomePage = () => {
       name: 'Bridal Choker',
       image: 'https://cdn.bradojewellery.com/is/540x/1713435297728.jpeg',
       description: 'Elegant for your special day',
-      link: '/products?category=1'
+      link: '/products?category=2'
     },
     {
       id: 2,
       name: 'Royalty Bangles',
       image: 'https://cdn.bradojewellery.com/is/540x/1713435591278.jpeg',
       description: 'Beautiful bangles for every occasion',
-      link: '/products?category=2'
+      link: '/products?category=4'
     },
     {
       id: 3,
@@ -33,7 +33,7 @@ const HomePage = () => {
       name: 'Exquisite Rings',
       image: 'https://cdn.bradojewellery.com/is/540x/1713435346824.jpeg',
       description: 'Fine crafted rings for every style',
-      link: '/products?category=4'
+      link: '/products?category=1'
     }
   ];
 

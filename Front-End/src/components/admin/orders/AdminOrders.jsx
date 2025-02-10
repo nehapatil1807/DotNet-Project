@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { Modal, Button } from 'react-bootstrap';
 import { orderService } from '../../../services/orderService';
 import { formatPrice, formatDate } from '../../../utils/formatters';
 import './AdminOrders.css';
@@ -79,9 +80,9 @@ const AdminOrders = () => {
   }
 
   return (
-    <div className="container-fluid p-4">
+    <div className="admin-orders">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4 filters-bar">
         <h2 className="mb-0">Orders Management</h2>
         <button 
           className="btn btn-primary"
@@ -104,7 +105,6 @@ const AdminOrders = () => {
                   <th>Customer</th>
                   <th>Total</th>
                   <th>Status</th>
-                  <th>Payment</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -138,11 +138,6 @@ const AdminOrders = () => {
                       )}
                     </td>
                     <td>
-                      <span className={`badge bg-${order.paymentStatus === 'Paid' ? 'success' : 'warning'}`}>
-                        {order.paymentStatus}
-                      </span>
-                    </td>
-                    <td>
                       <button
                         className="btn btn-sm btn-outline-primary"
                         onClick={() => {
@@ -162,90 +157,59 @@ const AdminOrders = () => {
       </div>
 
       {/* Order Details Modal */}
-      {showDetails && selectedOrder && (
-        <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Order Details #{selectedOrder.id}</h5>
-                <button 
-                  type="button" 
-                  className="btn-close"
-                  onClick={() => {
-                    setShowDetails(false);
-                    setSelectedOrder(null);
-                  }}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="row mb-4">
-                  <div className="col-md-6">
-                    <h6>Shipping Details</h6>
-                    <p className="mb-1">{selectedOrder.shippingDetails.fullName}</p>
-                    <p className="mb-1">{selectedOrder.shippingDetails.addressLine1}</p>
-                    {selectedOrder.shippingDetails.addressLine2 && (
-                      <p className="mb-1">{selectedOrder.shippingDetails.addressLine2}</p>
-                    )}
-                    <p className="mb-1">
-                      {selectedOrder.shippingDetails.city}, {selectedOrder.shippingDetails.state}
-                    </p>
-                    <p className="mb-1">{selectedOrder.shippingDetails.pincode}</p>
-                    <p className="mb-0">{selectedOrder.shippingDetails.phone}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <h6>Order Information</h6>
-                    <p className="mb-1">Status: {selectedOrder.status}</p>
-                    <p className="mb-1">Order Date: {formatDate(selectedOrder.orderDate)}</p>
-                    <p className="mb-1">Payment Method: {selectedOrder.paymentMethod}</p>
-                    <p className="mb-0">Payment Status: {selectedOrder.paymentStatus}</p>
-                  </div>
+      <Modal show={showDetails} onHide={() => setShowDetails(false)} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Order Details #{selectedOrder?.id}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedOrder && (
+            <>
+              <div className="customer-info">
+                <div className="info-group">
+                  <h6>Shipping Details</h6>
+                  <p>{selectedOrder.shippingDetails.fullName}</p>
+                  <p>{selectedOrder.shippingDetails.addressLine1}</p>
+                  {selectedOrder.shippingDetails.addressLine2 && (
+                    <p>{selectedOrder.shippingDetails.addressLine2}</p>
+                  )}
+                  <p>{selectedOrder.shippingDetails.city}, {selectedOrder.shippingDetails.state}</p>
+                  <p>{selectedOrder.shippingDetails.pincode}</p>
+                  <p>{selectedOrder.shippingDetails.phone}</p>
                 </div>
+                <div className="info-group">
+                  <h6>Order Information</h6>
+                  <p>Status: {selectedOrder.status}</p>
+                  <p>Order Date: {formatDate(selectedOrder.orderDate)}</p>
+                  <p>Payment Method: {selectedOrder.paymentMethod}</p>
+                  <p>Payment Status: {selectedOrder.paymentStatus}</p>
+                </div>
+              </div>
 
-                <h6>Order Items</h6>
-                <div className="table-responsive">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedOrder.items.map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.productName}</td>
-                          <td>{formatPrice(item.unitPrice)}</td>
-                          <td>{item.quantity}</td>
-                          <td>{formatPrice(item.subtotal)}</td>
-                        </tr>
-                      ))}
-                      <tr>
-                        <td colSpan="3" className="text-end"><strong>Total Amount:</strong></td>
-                        <td><strong>{formatPrice(selectedOrder.totalAmount)}</strong></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <h6>Order Items</h6>
+              <div className="order-items">
+                {selectedOrder.items.map((item) => (
+                  <div className="item-row" key={item.id}>
+                    <div className="item-image">
+                      <img src={item.productImage} alt={item.productName} />
+                    </div>
+                    <div className="item-details">
+                      <h6>{item.productName}</h6>
+                      <p className="item-meta">Price: {formatPrice(item.unitPrice)}</p>
+                      <p className="item-meta">Quantity: {item.quantity}</p>
+                    </div>
+                    <div className="item-price">{formatPrice(item.subtotal)}</div>
+                  </div>
+                ))}
               </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    setShowDetails(false);
-                    setSelectedOrder(null);
-                  }}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop fade show"></div>
-        </div>
-      )}
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDetails(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace ElegantJewellery.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User")]
     [ApiController]
     [Route("api/[controller]")]
     public class CartController : ControllerBase

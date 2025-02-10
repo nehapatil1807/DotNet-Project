@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { productService } from '../../services/productService';
 import { formatPrice } from '../../utils/formatters';
-import './Navbar.css';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -56,7 +55,7 @@ const Navbar = () => {
       const filtered = products.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
-      ).slice(0, 5); 
+      ).slice(0, 5); // Limit to 5 suggestions
       setSuggestions(filtered);
       setShowSuggestions(true);
     } else {
@@ -99,140 +98,216 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-      <div className="container">
-        <Link className="navbar-brand d-flex align-items-center" to="/">
-          <img src="/logo192.jpeg" alt="Logo" className="navbar-logo" />
-        </Link>
+    <nav className="sticky-top shadow-sm bg-white">
+      {/* Top bar with contact info */}
+      <div className="bg-primary text-white py-2">
+        <div className="container">
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center gap-3">
+              <span className="text-sm">
+                <i className="bi bi-telephone me-2"></i>
+                +91 98765 43210
+              </span>
+              <span className="text-sm">
+                <i className="bi bi-envelope me-2"></i>
+                info@elegantjewellery.com
+              </span>
+            </div>
+            <div className="d-flex gap-3">
+              <a href="#" className="text-white">
+                <i className="bi bi-facebook"></i>
+              </a>
+              <a href="#" className="text-white">
+                <i className="bi bi-instagram"></i>
+              </a>
+              <a href="#" className="text-white">
+                <i className="bi bi-twitter"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div className="d-flex flex-grow-1 mx-lg-5">
-          <div className="w-100 position-relative" ref={searchRef}>
-            <form className="w-100 position-relative" onSubmit={handleSearch}>
-              <input
-                type="text"
-                className="search-input rounded-pill"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={() => setShowSuggestions(Boolean(searchTerm && suggestions.length))}
-                aria-label="Search products"
+      {/* Main navbar */}
+      <div className="py-3 bg-white">
+        <div className="container">
+          <div className="d-flex justify-content-between align-items-center">
+            {/* Logo */}
+            <Link to="/" className="navbar-brand d-flex align-items-center">
+              <img 
+                src="/logo192.jpeg" 
+                alt="Elegant Jewellery" 
+                className="rounded"
+                style={{ height: '40px', width: 'auto' }}
               />
-              {searchTerm && (
-                <button
-                  type="button"
-                  className="clear-button"
-                  onClick={handleClearSearch}
-                  aria-label="Clear search"
-                >
-                  &times;
-                </button>
-              )}
-              <button 
-                type="submit" 
-                className="search-button"
-                aria-label="Submit search"
-              >
-                <i className="bi bi-search"></i>
-              </button>
-              {loadingProducts && <div className="search-loading"><i className="bi bi-arrow-clockwise"></i></div>}
-            </form>
+              <span className="ms-2 text-primary h4 mb-0 d-none d-md-block">
+                Elegant Jewellery
+              </span>
+            </Link>
 
-            {/* Search Suggestions Dropdown */}
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="search-suggestions">
-                {suggestions.map((product) => (
-                  <div
-                    key={product.id}
-                    className="suggestion-item"
-                    onClick={() => handleSuggestionClick(product)}
+            {/* Search Bar */}
+            <div className="flex-grow-1 mx-4 d-none d-md-block position-relative" ref={searchRef}>
+              <form className="w-100 position-relative" onSubmit={handleSearch}>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control border-end-0 bg-light"
+                    placeholder="Search for jewellery..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => setShowSuggestions(Boolean(searchTerm && suggestions.length))}
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary border-0 bg-light"
+                      onClick={handleClearSearch}
+                    >
+                      <i className="bi bi-x"></i>
+                    </button>
+                  )}
+                  <button 
+                    type="submit" 
+                    className="btn btn-outline-secondary border-start-0 bg-light"
                   >
-                    <div className="d-flex align-items-center">
+                    <i className="bi bi-search text-primary"></i>
+                  </button>
+                </div>
+
+                {loadingProducts && (
+                  <div className="position-absolute top-50 end-0 translate-middle-y me-5">
+                    <div className="spinner-border spinner-border-sm text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </form>
+
+              {/* Search Suggestions */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="position-absolute w-100 mt-2 bg-white rounded shadow-lg border p-2 z-3">
+                  {suggestions.map((product) => (
+                    <div
+                      key={product.id}
+                      className="d-flex align-items-center p-2 cursor-pointer hover-bg-light rounded"
+                      onClick={() => handleSuggestionClick(product)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <img
                         src={product.imageUrl}
                         alt={product.name}
-                        className="suggestion-image"
+                        className="rounded me-3"
+                        style={{ width: '40px', height: '40px', objectFit: 'cover' }}
                         onError={(e) => { e.target.src = '/placeholder.jpg' }}
                       />
-                      <div className="suggestion-details">
-                        <div className="suggestion-name">{product.name}</div>
-                        <div className="suggestion-category">{product.categoryName}</div>
-                        <div className="suggestion-price">{formatPrice(product.price)}</div>
+                      <div className="flex-grow-1">
+                        <div className="fw-medium">{product.name}</div>
+                        <div className="small text-muted">{product.categoryName}</div>
+                      </div>
+                      <div className="text-primary fw-medium">
+                        {formatPrice(product.price)}
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Navigation Links and Cart */}
+            <div className="d-flex align-items-center gap-3">
+              <Link to="/" className="text-decoration-none text-dark">
+                <i className="bi bi-house"></i>
+              </Link>
+              
+              <Link to="/products" className="text-decoration-none text-dark">
+                <i className="bi bi-gem"></i>
+              </Link>
+
+              {!user?.role?.includes('Admin') && (
+                <Link to="/cart" className="position-relative text-decoration-none text-dark">
+                  <i className="bi bi-cart3 fs-5"></i>
+                  {cart?.totalItems > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                      {cart.totalItems}
+                    </span>
+                  )}
+                </Link>
+              )}
+
+              {user ? (
+                <div className="dropdown">
+                  <button
+                    className="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                  >
+                    <div 
+                      className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                      style={{ width: '32px', height: '32px' }}
+                    >
+                      {user.firstName?.charAt(0).toUpperCase()}
+                    </div>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end shadow-sm">
+                    {user.role === 'Admin' ? (
+                      <>
+                        <li><Link className="dropdown-item" to="/admin/dashboard">Dashboard</Link></li>
+                        <li><Link className="dropdown-item" to="/admin/products">Products</Link></li>
+                        <li><Link className="dropdown-item" to="/admin/orders">Orders</Link></li>
+                      </>
+                    ) : (
+                      <>
+                        <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
+                        <li><Link className="dropdown-item" to="/orders">Orders</Link></li>
+                      </>
+                    )}
+                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <button className="dropdown-item text-danger" onClick={handleLogout} disabled={loading}>
+                        <i className="bi bi-box-arrow-right me-2"></i>
+                        {loading ? 'Logging out...' : 'Logout'}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <Link 
+                  to="/login" 
+                  className="btn btn-primary rounded-pill px-4"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="d-flex align-items-center">
-        <div className="d-flex align-items-center">
-  <Link to="/" className="nav-link me-4">
-    <i className="bi bi-house"></i>
-  </Link>
-  <Link to="/products" className="nav-link me-4">
-    <i className="bi bi-gem"></i>
-  </Link>
-  <Link to="/contact" className="nav-link me-4">
-    <i className="bi bi-envelope"></i>
-  </Link>
-</div>
-
-          {!user?.role?.includes('Admin') && (
-            <Link to="/cart" className="nav-link me-4 position-relative">
-              <i className="bi bi-cart3 fs-5"></i>
-              {cart?.totalItems > 0 && (
-                <span className="cart-badge">{cart.totalItems}</span>
-              )}
-            </Link>
+      {/* Mobile Search */}
+      <div className="d-md-none px-3 pb-3">
+        <div className="input-group">
+          <input
+            type="text"
+            className="form-control border-end-0 bg-light"
+            placeholder="Search for jewellery..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              className="btn btn-outline-secondary border-0 bg-light"
+              onClick={handleClearSearch}
+            >
+              <i className="bi bi-x"></i>
+            </button>
           )}
-
-          {user ? (
-            <div className="dropdown">
-              <button
-                className="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center user-avatar-hover"
-                type="button"
-                id="userMenu"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <div className="user-avatar">
-                  {user.profilePicture ? (
-                    <img src={user.profilePicture} alt="User  Avatar" className="avatar-image" />
-                  ) : (
-                    user.firstName?.charAt(0).toUpperCase() || 'U'
-                  )}
-                </div>
-              </button>
-              <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" role="menu">
-                {user.role === 'Admin' ? (
-                  <>
-                    <li><Link className="dropdown-item" to="/admin/dashboard">Dashboard</Link></li>
-                    <li><Link className="dropdown-item" to="/admin/products">Products</Link></li>
-                    <li><Link className="dropdown-item" to="/admin/orders">Orders</Link></li>
-                  </>
-                ) : (
-                  <>
-                    <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
-                    <li><Link className="dropdown-item" to="/orders">Orders</Link></li>
-                  </>
-                )}
-                <li><hr className="dropdown-divider" /></li>
-                <li>
-                  <button 
-                    className="dropdown-item text-danger" 
-                    onClick={handleLogout} 
-                    disabled={loading}
-                  >
-                    {loading ? 'Logging out...' : 'Logout'}
-                  </button>
-                </li>
-              </ul>
-            </div>
-          ) : (
-            <Link to="/login" className="login-button text-decoration-none">Login</Link>
-          )}
+          <button 
+            className="btn btn-outline-secondary border-start-0 bg-light"
+            onClick={handleSearch}
+          >
+            <i className="bi bi-search text-primary"></i>
+          </button>
         </div>
       </div>
     </nav>

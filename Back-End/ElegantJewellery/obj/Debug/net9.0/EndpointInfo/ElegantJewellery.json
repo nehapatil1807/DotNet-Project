@@ -999,6 +999,10 @@
             "type": "number",
             "format": "double"
           },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
           "quantity": {
             "type": "integer",
             "format": "int32"
@@ -1137,6 +1141,10 @@
             "format": "int32"
           },
           "productName": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
             "type": "string",
             "nullable": true
           },

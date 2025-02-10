@@ -45,7 +45,7 @@ const OrderTracking = () => {
   useEffect(() => {
     fetchOrderDetails();
     // Set up polling for status updates
-    const interval = setInterval(fetchOrderDetails, 30000);
+    const interval = setInterval(fetchOrderDetails, 30000); // Poll every 30 seconds
     return () => clearInterval(interval);
   }, [id]);
 
@@ -76,7 +76,7 @@ const OrderTracking = () => {
     
     const orderDate = new Date(order.orderDate);
     const deliveryDate = new Date(orderDate);
-    deliveryDate.setDate(deliveryDate.getDate() + 5);
+    deliveryDate.setDate(deliveryDate.getDate() + 5); // Estimate 5 days for delivery
     
     return deliveryDate.toLocaleDateString('en-IN', {
       weekday: 'long',
@@ -268,7 +268,7 @@ const OrderTracking = () => {
       {/* Action Buttons */}
       <div className="d-flex justify-content-between mt-4">
         <button
-          className="btn btn-outline-primary"
+          className="btn btn-outline-secondary"
           onClick={() => navigate('/orders')}
         >
           <i className="bi bi-arrow-left me-2"></i>

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VMgdnpqlFfg=",
+  "dgSpecHash": "kHpUiGfRK1E=",
   "success": true,
-  "projectFilePath": "C:\\Users\\prati\\OneDrive\\Desktop\\MyProjects\\DotNet-Project\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj",
+  "projectFilePath": "C:\\Users\\prati\\OneDrive\\Desktop\\DotNet-Project-main\\Back-End\\ElegantJewellery\\ElegantJewellery.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\prati\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\prati\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

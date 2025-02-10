@@ -234,6 +234,7 @@ namespace ElegantJewellery.Services
                 ProductId = cartItem.ProductId,
                 ProductName = product.Name,
                 ProductPrice = product.Price,
+                ImageUrl = product.ImageUrl,
                 Quantity = cartItem.Quantity,
                 Subtotal = product.Price * cartItem.Quantity,
                 AvailableStock = product.Stock

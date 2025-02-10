@@ -285,6 +285,7 @@ namespace ElegantJewellery.Services
                 Id = item.Id,
                 ProductId = item.ProductId,
                 ProductName = item.Product?.Name ?? "Unknown Product",
+                ImageUrl = item.Product?.ImageUrl,
                 Quantity = item.Quantity,
                 UnitPrice = item.Price,
                 Subtotal = item.Price * item.Quantity

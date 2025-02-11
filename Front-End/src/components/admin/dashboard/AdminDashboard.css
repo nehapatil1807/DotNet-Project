@@ -12,16 +12,16 @@
 }
 
 .stat-card {
-  background: white;
+  background: rgb(254, 251, 251);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
@@ -42,7 +42,7 @@
 
 .stat-icon.orders {
   background-color: rgba(86, 128, 233, 0.1);
-  color: #5680e9;
+  color: #5880e6;
 }
 
 .stat-icon.products {
@@ -94,7 +94,7 @@
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .chart-header {
@@ -128,13 +128,13 @@
 }
 
 .chart-filter:hover {
-  border-color: #B4833E;
-  color: #B4833E;
+  border-color: #b4833e;
+  color: #b4833e;
 }
 
 .chart-filter.active {
-  background: #B4833E;
-  border-color: #B4833E;
+  background: #b4833e;
+  border-color: #b4833e;
   color: white;
 }
 
@@ -142,7 +142,7 @@
 .orders-card {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
@@ -190,7 +190,7 @@
 .low-stock-card {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .low-stock-item {
@@ -237,11 +237,11 @@
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
-  
+
   .charts-row {
     gap: 1rem;
   }
-  
+
   .chart-card {
     padding: 1rem;
   }
